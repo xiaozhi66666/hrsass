@@ -8,8 +8,14 @@ const whiteList = ["/login", "/404"];
 
 router.beforeEach((to, form, next) => {
   const isLogin = store.state.user.token;
+  const userId = store.state.user.userId;
   // 1:已登录
   if (isLogin) {
+    // 触发存入用户信息的vuex  action方法
+    if (!userId) {
+      //如果vuex中没有id，重新触发刷新获取，优化解决每次切换不同页面路由都会刷新，发送请求用户信息的请求
+      store.dispatch("user/getUserInfo");
+    }
     //   判断是否要去的是登录页面
     //   是跳到首页
     //   不是就直接进入

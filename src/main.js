@@ -1,19 +1,20 @@
-import Vue from 'vue'
+import Vue from "vue";
 
-import 'normalize.css/normalize.css' // A modern alternative to CSS resets
+import "normalize.css/normalize.css"; // A modern alternative to CSS resets
 
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/en' // lang i18n
+import ElementUI from "element-ui";
+import "element-ui/lib/theme-chalk/index.css";
+import locale from "element-ui/lib/locale/lang/en"; // lang i18n
 
-import '@/styles/index.scss' // global css
+import "@/styles/index.scss"; // global css
 
-import App from './App'
-import store from './store'
-import router from './router'
-
-import '@/icons' // icon
-import '@/permission' // permission control
+import App from "./App";
+import store from "./store";
+import router from "./router";
+// 一次性导入所有指定文件中的数据
+import * as derectives from "@/derectives";
+import "@/icons"; // icon
+import "@/permission"; // permission control
 
 /**
  * If you don't want to use mock-server
@@ -24,21 +25,27 @@ import '@/permission' // permission control
  * please remove it before going online ! ! !
  */
 // 模拟登录数据
-if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
+if (process.env.NODE_ENV === "production") {
+  const { mockXHR } = require("../mock");
+  mockXHR();
+}
+// 循环对象，这样就可以注册derectives中所有的自定义指令
+for (let key in derectives) {
+  // Vue.derectives('参数1'（自定义指令名）,'参数2'（value）)
+  Vue.directive(key, derectives[key]);
 }
 
+// 添加全局自定义指令
 // set ElementUI lang to EN
-Vue.use(ElementUI, { locale })
+Vue.use(ElementUI, { locale });
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 new Vue({
-  el: '#app',
+  el: "#app",
   router,
   store,
-  render: (h) => h(App)
-})
+  render: (h) => h(App),
+});
