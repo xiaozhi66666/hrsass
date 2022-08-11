@@ -6,7 +6,7 @@ import store from "@/store";
 //设置未登录可访问的白名单
 const whiteList = ["/login", "/404"];
 
-router.beforeEach((to, form, next) => {
+router.beforeEach(async (to, form, next) => {
   const isLogin = store.state.user.token;
   const userId = store.state.user.userId;
   // 1:已登录
@@ -14,7 +14,8 @@ router.beforeEach((to, form, next) => {
     // 触发存入用户信息的vuex  action方法
     if (!userId) {
       //如果vuex中没有id，重新触发刷新获取，优化解决每次切换不同页面路由都会刷新，发送请求用户信息的请求
-      store.dispatch("user/getUserInfo");
+      // 这里添加await，因为dispatch返回的是promise，需要在页面跳转前保证信息已经存入到vuex中，所以添加await,等信息存入完毕之后再进行跳转
+      await store.dispatch("user/getUserInfo");
     }
     //   判断是否要去的是登录页面
     //   是跳到首页

@@ -31,7 +31,32 @@
           >
           </el-pagination>
         </el-tab-pane>
-        <el-tab-pane label="公司信息" name="second">公司信息</el-tab-pane>
+        <el-tab-pane label="公司信息" name="second">
+          <el-alert
+            title="对公司名称、公司地址、营业执照、公司地区的更新，将使得公司资料被重新审核，请谨慎修改"
+            type="info"
+            show-icon
+            :closable="false"
+          >
+          </el-alert>
+          <el-form ref="form" label-width="80px" :model="companyInfo">
+            <el-form-item label="公司名称">
+              <el-input disabled v-model="companyInfo.name"></el-input>
+            </el-form-item>
+            <el-form-item label="公司地址">
+              <el-input
+                disabled
+                v-model="companyInfo.companyAddress"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="公司邮箱">
+              <el-input disabled v-model="companyInfo.mailbox"></el-input>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input disabled v-model="companyInfo.remarks"></el-input>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
       </el-tabs>
       <!-- 添加角色对话框 -->
       <el-dialog
@@ -65,6 +90,7 @@
 
 <script>
 import { getRolesListAPI, addRolesAPI } from "@/api/role";
+import { getCompanyInfoApi } from "@/api/company";
 export default {
   name: "companySetting",
   data() {
@@ -83,11 +109,13 @@ export default {
       roleFormRules: {
         name: [{ required: true, message: "请填写角色名称", trigger: "blur" }],
       },
+      companyInfo: {},
     };
   },
 
   created() {
     this.getRolesList();
+    this.getCompanyInfo();
   },
 
   methods: {
@@ -122,6 +150,13 @@ export default {
       // 重置表单内容
       this.$refs.form.resetFields();
       this.roleForm.description = "";
+    },
+    // 获取公司信息
+    async getCompanyInfo() {
+      const res = await getCompanyInfoApi(
+        this.$store.state.user.userInfo.companyId
+      );
+      this.companyInfo = res;
     },
   },
 };
