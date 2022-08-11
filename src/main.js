@@ -15,6 +15,10 @@ import router from "./router";
 import * as derectives from "@/derectives";
 import "@/icons"; // icon
 import "@/permission"; // permission control
+// 引入components组件
+import components from "@/components";
+// 注册所有组件
+Vue.use(components);
 
 /**
  * If you don't want to use mock-server

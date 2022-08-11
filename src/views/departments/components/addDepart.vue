@@ -60,7 +60,7 @@ import {
   addDepartmentAPI,
   editDepartInfoAPI,
 } from "@/api/departments";
-import { getStaffListAPI } from "@/api/staffManage";
+import { getStaffListAPI } from "@/api/employees";
 import { getTreeDataByIdAPI } from "@/api/departments";
 export default {
   name: "addDapart",
