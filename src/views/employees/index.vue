@@ -7,7 +7,9 @@
           <el-button size="small" type="warning" @click="$router.push('import')"
             >导入</el-button
           >
-          <el-button size="small" type="danger">导出</el-button>
+          <el-button size="small" type="danger" @click="exportEmployees"
+            >导出</el-button
+          >
           <el-button size="small" type="primary" @click="addEmployees"
             >新增员工</el-button
           >
@@ -98,8 +100,10 @@
 <script>
 import { getEmployeesAPI, delEmployeeApi } from "@/api/employees";
 import employees from "@/constant/employees";
-
+const { exportExcelMapPath, hireType } = employees;
 import AddEmployee from "./components/add-employees";
+// import { export_json_to_excel } from "@/vendor/Export2Excel";
+
 export default {
   name: "Employees",
   data() {
@@ -132,7 +136,6 @@ export default {
     },
     // 页码发生改变触发的事件
     currentChangePage(val) {
-      console.log(val);
       this.pages.page = val;
       this.getEmployees();
     },
@@ -144,7 +147,7 @@ export default {
     },
     formatterFormOfEmployment(row, column, cellValue, index) {
       // 通过定义好的模块映射关系，循环遍历定义好的数组，根据id寻找到对应项，根据是否找到对应项，返回该id对应的value
-      const findObj = employees.hireType.find((item) => item.id === cellValue);
+      const findObj = hireType.find((item) => item.id === cellValue);
       return findObj ? findObj.value : "未知";
     },
     async delStaff(id) {
@@ -156,6 +159,40 @@ export default {
     // 新增员工
     addEmployees() {
       this.showAddEmployees = true;
+    },
+    // 导出
+    async exportEmployees() {
+      console.log(hireType);
+      // 模块导入懒加载
+      const { export_json_to_excel } = await import("@/vendor/Export2Excel");
+      const { rows } = await getEmployeesAPI({
+        page: 1, //
+        size: this.total, //
+      });
+      // 表头数据
+      const header = Object.keys(exportExcelMapPath);
+
+      const data = rows.map((item) => {
+        return header.map((h) => {
+          if (h === "聘用形式") {
+            const findItem = hireType.find((hire) => {
+              return hire.id === item[exportExcelMapPath[h]];
+            });
+            return findItem ? findItem.value : "未知";
+          } else {
+            return item[exportExcelMapPath[h]];
+          }
+        });
+      });
+      export_json_to_excel({
+        header, //表头 必填
+        data, //具体数据 必填
+        filename: "员工列表", //非必填文件名
+        autoWidth: true, //非必填
+        bookType: "xlsx", //非必填
+        multiHeader: [["手机号", "其他信息", "", "", "", "", "部门"]],
+        merges: ["A1:A2", "B1:F1", "G1:G2"],
+      });
     },
   },
 };
