@@ -4,33 +4,68 @@
       <page-tools :isShowLeft="true">
         <span slot="left-tag">共166条记录</span>
         <template slot="right">
-          <el-button size="small" type="warning">导入</el-button>
+          <el-button size="small" type="warning" @click="$router.push('import')"
+            >导入</el-button
+          >
           <el-button size="small" type="danger">导出</el-button>
-          <el-button size="small" type="primary">新增员工</el-button>
+          <el-button size="small" type="primary" @click="addEmployees"
+            >新增员工</el-button
+          >
         </template>
       </page-tools>
       <!-- 放置表格和分页 -->
       <el-card v-loading="loading">
         <el-table border :data="employeesList">
           <el-table-column label="序号" sortable="" type="index" />
+          <el-table-column label="员工头像">
+            <template slot-scope="{ row }">
+              <img
+                :src="row.staffPhoto"
+                alt=""
+                v-imgError="require('@/assets/common/head.jpg')"
+                style="
+                  border-radius: 50%;
+                  width: 100px;
+                  height: 100px;
+                  padding: 10px;
+                "
+              />
+            </template>
+          </el-table-column>
           <el-table-column label="姓名" sortable="" prop="username" />
           <el-table-column label="工号" sortable="" prop="workNumber" />
           <el-table-column
             label="聘用形式"
             sortable=""
             prop="formOfEmployment"
+            :formatter="formatterFormOfEmployment"
           />
           <el-table-column label="部门" sortable="" prop="departmentName" />
-          <el-table-column label="入职时间" sortable="" prop="timeOfEntry" />
-          <el-table-column label="账户状态" sortable="" prop="enableState" />
+          <el-table-column label="入职时间" sortable="">
+            <template slot-scope="{ row }">{{
+              row.timeOfEntry | timeFormat
+            }}</template>
+          </el-table-column>
+          <el-table-column label="账户状态" sortable="">
+            <template slot-scope="{ row }">
+              <el-switch
+                :value="row.enableState === 1"
+                active-color="skyblue"
+                inactive-color="#13ce66"
+              >
+              </el-switch>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" sortable="" fixed="right" width="280">
-            <template>
+            <template slot-scope="{ row }">
               <el-button type="text" size="small">查看</el-button>
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
               <el-button type="text" size="small">角色</el-button>
-              <el-button type="text" size="small">删除</el-button>
+              <el-button type="text" size="small" @click="delStaff(row.id)"
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -45,18 +80,26 @@
             layout="total,sizes,prev, pager, next"
             :total="total"
             :page-sizes="[5, 10, 15, 20]"
-            :page-size="pages.page"
+            :page-size="pages.size"
             @current-change="currentChangePage"
             @size-change="currentChangeSize"
+            :current-page.sync="pages.page"
           />
         </el-row>
       </el-card>
     </div>
+    <add-employee
+      :visible.sync="showAddEmployees"
+      @addEmployees="getEmployees"
+    />
   </div>
 </template>
 
 <script>
-import { getEmployeesAPI } from "@/api/employees";
+import { getEmployeesAPI, delEmployeeApi } from "@/api/employees";
+import employees from "@/constant/employees";
+
+import AddEmployee from "./components/add-employees";
 export default {
   name: "Employees",
   data() {
@@ -68,7 +111,11 @@ export default {
         size: 5,
       },
       loading: false,
+      showAddEmployees: false, //控制是否展示新增弹出层
     };
+  },
+  components: {
+    AddEmployee,
   },
 
   created() {
@@ -85,16 +132,33 @@ export default {
     },
     // 页码发生改变触发的事件
     currentChangePage(val) {
+      console.log(val);
       this.pages.page = val;
       this.getEmployees();
     },
     // 一页的数据量发生改变触发的事件
-    currentChangeSize(val) {
+    async currentChangeSize(val) {
+      console.log(val);
       this.pages.size = val;
       this.getEmployees();
+    },
+    formatterFormOfEmployment(row, column, cellValue, index) {
+      // 通过定义好的模块映射关系，循环遍历定义好的数组，根据id寻找到对应项，根据是否找到对应项，返回该id对应的value
+      const findObj = employees.hireType.find((item) => item.id === cellValue);
+      return findObj ? findObj.value : "未知";
+    },
+    async delStaff(id) {
+      await this.$confirm("确定删除？");
+      await delEmployeeApi(id);
+      this.$message.success("删除成功！");
+      this.getEmployees();
+    },
+    // 新增员工
+    addEmployees() {
+      this.showAddEmployees = true;
     },
   },
 };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="scss" scoped></style>

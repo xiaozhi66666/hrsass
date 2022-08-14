@@ -11,15 +11,26 @@ import "default-passive-events";
 import App from "./App";
 import store from "./store";
 import router from "./router";
-// 一次性导入所有指定文件中的数据
-import * as derectives from "@/derectives";
+
 import "@/icons"; // icon
 import "@/permission"; // permission control
+// 一次性导入所有指定文件中的数据
+import * as derectives from "@/derectives";
+// 循环对象，这样就可以注册derectives中所有的自定义指令
+for (let key in derectives) {
+  // Vue.derectives('参数1'（自定义指令名）,'参数2'（value）)
+  Vue.directive(key, derectives[key]);
+}
 // 引入components组件
 import components from "@/components";
 // 注册所有组件
 Vue.use(components);
-
+// 一次性引入所有自定义过滤器
+import * as filters from "@/filters";
+// 循环注册自定义过滤器，这个对象key为过滤器的name，filters[key]为自定义指令方法
+for (let key in filters) {
+  Vue.filter(key, filters[key]);
+}
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -32,11 +43,6 @@ Vue.use(components);
 if (process.env.NODE_ENV === "production") {
   const { mockXHR } = require("../mock");
   mockXHR();
-}
-// 循环对象，这样就可以注册derectives中所有的自定义指令
-for (let key in derectives) {
-  // Vue.derectives('参数1'（自定义指令名）,'参数2'（value）)
-  Vue.directive(key, derectives[key]);
 }
 
 // 添加全局自定义指令

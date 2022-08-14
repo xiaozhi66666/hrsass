@@ -1,11 +1,12 @@
 import Layout from "@/layout";
 export default {
-  path: "/permission",
+  path: "/import",
   component: Layout,
+  hidden: true,
   children: [
     {
-      path: "",
-      component: () => import("@/views/permission"),
+      path: "/import",
+      component: () => import("@/views/import"),
       meta: { title: "权限管理", icon: "lock" },
     },
   ],
