@@ -58,6 +58,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <upload-img ref="staffHeaderPic" @onSuccess="onSuccessHeader" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -93,6 +94,7 @@
 
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <upload-img ref="staffPic" @onSuccess="onSuccessStaffPic" />
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -471,17 +473,39 @@ export default {
   methods: {
     async loadUserInfoDetail() {
       this.userInfo = await getUserInfoDetail(this.userId);
+      this.$refs.staffHeaderPic.fileList.push({
+        url: this.userInfo.staffPhoto,
+      });
     },
     async loadPersonalDetail() {
       this.formData = await getPersonalDetail(this.userId);
+      this.$refs.staffPic.fileList.push({
+        url: this.formData.staffPhoto,
+      });
     },
     async onSaveUserDetail() {
+      // 优化如果用户在上传头像还在加载状态中不让用户点击保存
+      if (this.$refs.staffHeaderPic.loading) {
+        return this.$message.error("头像加载中，请稍后~~");
+      }
       await saveUserDetailById(this.userInfo);
       this.$message.success("保存用户信息成功！");
     },
     async onUpdatePersonal() {
+      // 优化如果用户在上传头像还在加载状态中不让用户点击保存
+      if (this.$refs.staffPic.loading) {
+        return this.$message.error("头像加载中，请稍后~~");
+      }
       await updatePersonal(this.formData);
       this.$message.success("保存用户信息成功！");
+    },
+    // 监听上传头像成功
+    onSuccessHeader({ url }) {
+      this.userInfo.staffPhoto = url;
+    },
+    // 监听上传员工照片成功
+    onSuccessStaffPic({ url }) {
+      this.formData.staffPhoto = url;
     },
   },
 };
