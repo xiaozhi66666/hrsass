@@ -14,7 +14,12 @@
             <el-table-column prop="description" label="描述"> </el-table-column>
             <el-table-column prop="address" label="操作">
               <template>
-                <el-button type="success" size="small">分配权限</el-button>
+                <el-button
+                  type="success"
+                  size="small"
+                  @click="showRoleDialogVisible"
+                  >分配权限</el-button
+                >
                 <el-button type="primary" size="small">编辑</el-button>
                 <el-button type="danger" size="small">删除</el-button>
               </template>
@@ -84,6 +89,23 @@
           <el-button @click="addRoles">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 分配角色权限对话框 -->
+      <el-dialog title="分配权限" :visible.sync="roleDialogVisible" width="50%">
+        <el-tree
+          :data="permission"
+          :props="{ label: 'name' }"
+          default-expand-all
+          show-checkbox
+          :default-checked-keys="defaultCheckList"
+          node-key="id"
+        ></el-tree>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="roleDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="dialogVisible = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -91,6 +113,8 @@
 <script>
 import { getRolesListAPI, addRolesAPI } from "@/api/role";
 import { getCompanyInfoApi } from "@/api/company";
+import { getPermissionList } from "@/api/permission";
+import { transListToTree } from "@/utils";
 export default {
   name: "companySetting",
   data() {
@@ -101,6 +125,7 @@ export default {
       pagesize: 3,
       page: 2,
       addDialogVisible: false,
+      roleDialogVisible: true,
       roleForm: {
         name: "",
         description: "",
@@ -110,12 +135,15 @@ export default {
         name: [{ required: true, message: "请填写角色名称", trigger: "blur" }],
       },
       companyInfo: {},
+      permission: [], //权限列表
+      defaultCheckList: ["1", "1063327833876729856"], //选中权限的列表
     };
   },
 
   created() {
     this.getRolesList();
     this.getCompanyInfo();
+    this.getPermissionList();
   },
 
   methods: {
@@ -157,6 +185,16 @@ export default {
         this.$store.state.user.userInfo.companyId
       );
       this.companyInfo = res;
+    },
+    // 分配权限
+    showRoleDialogVisible() {
+      this.roleDialogVisible = true;
+    },
+    // 获取权限列表
+    async getPermissionList() {
+      const res = await getPermissionList();
+      const treePermissions = transListToTree(res, "0");
+      this.permission = treePermissions;
     },
   },
 };

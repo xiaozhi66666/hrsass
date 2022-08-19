@@ -70,7 +70,12 @@
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="showRoleAssign(row.id)"
+                >角色</el-button
+              >
               <el-button type="text" size="small" @click="delStaff(row.id)"
                 >删除</el-button
               >
@@ -106,6 +111,11 @@
         <canvas id="canvas" />
       </el-row>
     </el-dialog>
+    <!-- 角色弹出层 -->
+    <assign-role
+      :dialogVisible.sync="roleVisible"
+      :employeesId="currentRoleId"
+    />
   </div>
 </template>
 
@@ -114,7 +124,9 @@ import { getEmployeesAPI, delEmployeeApi } from "@/api/employees";
 import employees from "@/constant/employees";
 const { exportExcelMapPath, hireType } = employees;
 import AddEmployee from "./components/add-employees";
+import AssignRole from "./components/assign-role.vue";
 import QrCode from "qrcode";
+// import AssignRole from './components/assign-role.vue';
 // import { export_json_to_excel } from "@/vendor/Export2Excel";
 
 export default {
@@ -130,9 +142,12 @@ export default {
       loading: false,
       showAddEmployees: false, //控制是否展示新增弹出层
       dialogVisible: false,
+      roleVisible: false,
+      currentRoleId: "", //点击到的当前的id
     };
   },
   components: {
+    AssignRole,
     AddEmployee,
   },
 
@@ -219,6 +234,11 @@ export default {
         const canvas = document.getElementById("canvas");
         QrCode.toCanvas(canvas, staffPhoto);
       });
+    },
+    //显示角色分配弹层
+    showRoleAssign(id) {
+      this.currentRoleId = id;
+      this.roleVisible = true;
     },
   },
 };
