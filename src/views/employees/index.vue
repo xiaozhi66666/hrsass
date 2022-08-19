@@ -22,6 +22,7 @@
           <el-table-column label="员工头像">
             <template slot-scope="{ row }">
               <img
+                @click="isShowEwPhoto(row.staffPhoto)"
                 :src="row.staffPhoto"
                 alt=""
                 v-imgError="require('@/assets/common/head.jpg')"
@@ -99,6 +100,12 @@
       :visible.sync="showAddEmployees"
       @addEmployees="getEmployees"
     />
+    <!-- 图片二维码弹出层 -->
+    <el-dialog title="图片二维码" :visible.sync="dialogVisible">
+      <el-row type="flex" justify="center">
+        <canvas id="canvas" />
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
@@ -107,6 +114,7 @@ import { getEmployeesAPI, delEmployeeApi } from "@/api/employees";
 import employees from "@/constant/employees";
 const { exportExcelMapPath, hireType } = employees;
 import AddEmployee from "./components/add-employees";
+import QrCode from "qrcode";
 // import { export_json_to_excel } from "@/vendor/Export2Excel";
 
 export default {
@@ -121,6 +129,7 @@ export default {
       },
       loading: false,
       showAddEmployees: false, //控制是否展示新增弹出层
+      dialogVisible: false,
     };
   },
   components: {
@@ -197,6 +206,18 @@ export default {
         bookType: "xlsx", //非必填
         multiHeader: [["手机号", "其他信息", "", "", "", "", "部门"]],
         merges: ["A1:A2", "B1:F1", "G1:G2"],
+      });
+    },
+    // 展示头像二维码
+    isShowEwPhoto(staffPhoto) {
+      if (!staffPhoto) {
+        return this.$message.error("该用户暂无头像");
+      }
+      this.dialogVisible = true;
+      // 数据更新驱动视图是异步的，视图需要等到所有数据更新完成之后再进行更新，所以使用$nextTick进行获取最新视图
+      this.$nextTick(() => {
+        const canvas = document.getElementById("canvas");
+        QrCode.toCanvas(canvas, staffPhoto);
       });
     },
   },

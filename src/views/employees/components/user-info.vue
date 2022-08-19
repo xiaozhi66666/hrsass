@@ -2,6 +2,10 @@
   <div class="user-info">
     <!-- 个人信息 -->
     <el-form label-width="220px">
+      <i
+        class="el-icon-printer"
+        @click="$router.push(`/employees/print/${userId}?type=personal`)"
+      ></i>
       <!-- 工号 入职时间 -->
       <el-row class="inline-info">
         <el-col :span="12">

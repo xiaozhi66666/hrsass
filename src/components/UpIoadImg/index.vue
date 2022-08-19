@@ -34,7 +34,7 @@ var cos = new COS({
   SecretId: "AKID55oGRLyQdaHitoVv52lEQKxKQ0JNAgvt",
   SecretKey: "jAKDpAE1YomTt3vWqtfANKzNTIq77qIU",
 });
-console.log(cos);
+// console.log(cos);
 export default {
   name: "UploadImg",
   data() {

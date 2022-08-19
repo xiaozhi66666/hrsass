@@ -11,7 +11,9 @@ import "default-passive-events";
 import App from "./App";
 import store from "./store";
 import router from "./router";
-
+import Print from "vue-print-nb";
+// Global instruction
+Vue.use(Print);
 import "@/icons"; // icon
 import "@/permission"; // permission control
 // 一次性导入所有指定文件中的数据

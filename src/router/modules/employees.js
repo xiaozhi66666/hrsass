@@ -14,5 +14,11 @@ export default {
       hidden: true, //隐藏在左侧菜单栏中显示
       // title: "员工详情",
     },
+    {
+      path: "print/:id",
+      component: () => import("@/views/employees/print"),
+      hidden: true, //隐藏在左侧菜单栏中显示
+      // title: "员工详情",
+    },
   ],
 };
