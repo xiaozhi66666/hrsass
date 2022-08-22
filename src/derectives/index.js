@@ -1,3 +1,4 @@
+import store from "@/store";
 // 定义一个自定义指令并导出
 export const imgError = {
   // 将value从binfing解构出来
@@ -17,6 +18,24 @@ export const imgError = {
   update(el, { value }) {
     if (!el.src) {
       el.src = value;
+    }
+  },
+};
+
+export const isHas = {
+  // binding:指令和dom绑定，可获取传给自定义指令的数据
+  // inserted:指令所绑定的元素插入到父节点时触发的函数
+  // update:指令所绑定的Vnode(虚拟dom)
+  inserted(el, binding) {
+    // 获取vuex中的权限点数组数据,首先得引入store
+    // 进行判断，是否包含传进来的字段
+    console.log(el);
+    console.log(binding);
+    const isHas = store.state.permission.points.includes(binding.value);
+    console.log(isHas);
+    // 如果没有就移除该dom元素
+    if (!isHas) {
+      el.remove();
     }
   },
 };

@@ -2,6 +2,9 @@ import Layout from "@/layout";
 export default {
   path: "/employees",
   component: Layout,
+  meta: {
+    id: "employees", //用于跟后台返回路由对应起来的id标识
+  },
   children: [
     {
       path: "",

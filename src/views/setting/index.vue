@@ -3,7 +3,10 @@
     <div class="app-container">
       <el-tabs v-model="activeName">
         <el-tab-pane label="新增角色" name="first">
-          <el-button type="primary" @click="addDialogVisible = true"
+          <el-button
+            type="primary"
+            @click="addDialogVisible = true"
+            v-isHas="points.roles.add"
             >新增角色</el-button
           >
           <!-- 表格 -->
@@ -13,11 +16,11 @@
 
             <el-table-column prop="description" label="描述"> </el-table-column>
             <el-table-column prop="address" label="操作">
-              <template>
+              <template slot-scope="{ row }">
                 <el-button
                   type="success"
                   size="small"
-                  @click="showRoleDialogVisible"
+                  @click="showRoleDialogVisible(row.id)"
                   >分配权限</el-button
                 >
                 <el-button type="primary" size="small">编辑</el-button>
@@ -90,7 +93,13 @@
         </span>
       </el-dialog>
       <!-- 分配角色权限对话框 -->
-      <el-dialog title="分配权限" :visible.sync="roleDialogVisible" width="50%">
+      <el-dialog
+        title="分配权限"
+        :visible.sync="roleDialogVisible"
+        width="50%"
+        @close="onCloseDialog"
+        destroy-on-close
+      >
         <el-tree
           :data="permission"
           :props="{ label: 'name' }"
@@ -98,12 +107,11 @@
           show-checkbox
           :default-checked-keys="defaultCheckList"
           node-key="id"
+          ref="treePermission"
         ></el-tree>
         <span slot="footer" class="dialog-footer">
           <el-button @click="roleDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible = false"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="onSave">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -111,12 +119,20 @@
 </template>
 
 <script>
-import { getRolesListAPI, addRolesAPI } from "@/api/role";
+import {
+  getRolesListAPI,
+  addRolesAPI,
+  getRoleInfoApi,
+  assignPerm,
+} from "@/api/role";
 import { getCompanyInfoApi } from "@/api/company";
 import { getPermissionList } from "@/api/permission";
 import { transListToTree } from "@/utils";
+import MixinPermission from "@/mixins/permission";
+// import points from "@/constant/permission";
 export default {
   name: "companySetting",
+  mixins: [MixinPermission],
   data() {
     return {
       activeName: "first",
@@ -125,18 +141,20 @@ export default {
       pagesize: 3,
       page: 2,
       addDialogVisible: false,
-      roleDialogVisible: true,
+      roleDialogVisible: false,
+      roleId: "",
       roleForm: {
         name: "",
         description: "",
       },
+      // rolesPoints: points,
       // 校验规则
       roleFormRules: {
         name: [{ required: true, message: "请填写角色名称", trigger: "blur" }],
       },
       companyInfo: {},
       permission: [], //权限列表
-      defaultCheckList: ["1", "1063327833876729856"], //选中权限的列表
+      defaultCheckList: [], //选中权限的列表
     };
   },
 
@@ -187,8 +205,11 @@ export default {
       this.companyInfo = res;
     },
     // 分配权限
-    showRoleDialogVisible() {
+    async showRoleDialogVisible(id) {
+      this.roleId = id;
       this.roleDialogVisible = true;
+      const { permIds } = await getRoleInfoApi(id);
+      this.defaultCheckList = permIds;
     },
     // 获取权限列表
     async getPermissionList() {
@@ -196,6 +217,25 @@ export default {
       const treePermissions = transListToTree(res, "0");
       this.permission = treePermissions;
     },
+    // 监听对话框关闭
+    onCloseDialog() {
+      // 将选中数据关闭
+      this.defaultCheckList = [];
+    },
+    async onSave() {
+      // 发送请求
+      await assignPerm({
+        id: this.roleId,
+        // 获取树形已选中的节点信息数组
+        permIds: this.$refs.treePermission.getCheckedKeys(),
+      });
+      this.$message.success("分配权限成功！");
+      this.roleDialogVisible = false;
+    },
+    // // 判断员工是否有删除编辑等权限
+    // isHasPoints(points) {
+    //   return this.$store.state.permission.points.includes(points);
+    // },
   },
 };
 </script>

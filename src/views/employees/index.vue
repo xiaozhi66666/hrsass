@@ -4,13 +4,21 @@
       <page-tools :isShowLeft="true">
         <span slot="left-tag">共166条记录</span>
         <template slot="right">
-          <el-button size="small" type="warning" @click="$router.push('import')"
+          <el-button
+            size="small"
+            type="warning"
+            @click="$router.push('import')"
+            v-if="isHasPoints(employeesPermission.employeesPer.import)"
             >导入</el-button
           >
           <el-button size="small" type="danger" @click="exportEmployees"
             >导出</el-button
           >
-          <el-button size="small" type="primary" @click="addEmployees"
+          <el-button
+            size="small"
+            type="primary"
+            @click="addEmployees"
+            v-if="isHasPoints(employeesPermission.employeesPer.add)"
             >新增员工</el-button
           >
         </template>
@@ -76,7 +84,11 @@
                 @click="showRoleAssign(row.id)"
                 >角色</el-button
               >
-              <el-button type="text" size="small" @click="delStaff(row.id)"
+              <el-button
+                type="text"
+                size="small"
+                @click="delStaff(row.id)"
+                :disabled="!isHasPoints(employeesPermission.employeesPer.del)"
                 >删除</el-button
               >
             </template>
@@ -123,6 +135,7 @@
 import { getEmployeesAPI, delEmployeeApi } from "@/api/employees";
 import employees from "@/constant/employees";
 const { exportExcelMapPath, hireType } = employees;
+import employeesPer from "@/constant/permission";
 import AddEmployee from "./components/add-employees";
 import AssignRole from "./components/assign-role.vue";
 import QrCode from "qrcode";
@@ -144,6 +157,7 @@ export default {
       dialogVisible: false,
       roleVisible: false,
       currentRoleId: "", //点击到的当前的id
+      employeesPermission: employeesPer,
     };
   },
   components: {
@@ -239,6 +253,10 @@ export default {
     showRoleAssign(id) {
       this.currentRoleId = id;
       this.roleVisible = true;
+    },
+    // 判断员工是否有删除编辑等权限
+    isHasPoints(points) {
+      return this.$store.state.permission.points.includes(points);
     },
   },
 };

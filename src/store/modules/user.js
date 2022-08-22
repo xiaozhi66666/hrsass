@@ -1,5 +1,6 @@
 import { getUserInfoApi, getUserInfoDetail, loginAPI } from "@/api/user";
 import { setTimestamp } from "@/utils/auth";
+import { resetRouter } from "@/router";
 
 export default {
   namespaced: true, //
@@ -36,6 +37,8 @@ export default {
       const userInfoDetail = await getUserInfoDetail(userInfo.userId);
       // 将两个获取到的信息结构出来放入一个对象，传递进去
       context.commit("setUserInfo", { ...userInfo, ...userInfoDetail });
+      // 在actions中可以return数据 ，并且return出去的是一个promise对象
+      return userInfo;
     },
     // 退出登录
     logout(context) {
@@ -43,6 +46,10 @@ export default {
       context.commit("setToken", "");
       // 将用户信息置空对象
       context.commit("setUserInfo", {});
+      // 重置路由
+      resetRouter();
+      // 触发permission中的方法   context.commit("模块/方法"  , 要设置的值 ， {root : true})
+      context.commit("permission/setRoutes", [], { root: true });
     },
   },
 };

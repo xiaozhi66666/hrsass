@@ -38,4 +38,8 @@ export default {
 };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="scss" scoped>
+.bpx-card {
+  margin: 20px 0;
+}
+</style>
