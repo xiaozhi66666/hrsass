@@ -9,11 +9,18 @@
     <div class="app-breadcrumb">
       {{ $store.state.user.userInfo.companyName }}
       <span class="breadBtn">体验版</span>
+      <!-- <span>{{ $t("sayHi") }}</span> -->
+      <!-- <span>{{ $t("message") }}</span> -->
+      <!-- <span>{{ $t("message.hello") }}</span> -->
     </div>
 
     <div class="right-menu">
+      <!-- 多语言切换 -->
+      <toogle-lang />
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
+          <!-- 满屏图标 -->
+          <full-screen />
           <img
             :src="$store.state.user.userInfo.staffPhoto"
             class="user-avatar"
@@ -116,7 +123,9 @@ export default {
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
+    // line-height: 50px;
+    display: flex;
+    align-items: center;
 
     &:focus {
       outline: none;
@@ -150,6 +159,9 @@ export default {
         position: relative;
         color: #fff;
         cursor: pointer;
+        // display: flex;
+        justify-content: center;
+        align-items: center;
         span {
           margin: 0 6px;
         }

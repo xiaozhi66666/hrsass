@@ -29,8 +29,8 @@ export const isHas = {
   inserted(el, binding) {
     // 获取vuex中的权限点数组数据,首先得引入store
     // 进行判断，是否包含传进来的字段
-    console.log(el);
-    console.log(binding);
+    // console.log(el);
+    // console.log(binding);
     const isHas = store.state.permission.points.includes(binding.value);
     console.log(isHas);
     // 如果没有就移除该dom元素
