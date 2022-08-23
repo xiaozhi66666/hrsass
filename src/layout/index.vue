@@ -13,6 +13,8 @@
       <div :class="{ 'fixed-header': fixedHeader }">
         <!-- 头部固定nav栏 -->
         <navbar />
+        <!-- 页签 -->
+        <TagsView />
       </div>
       <!-- 子路由出口 -->
       <app-main />
@@ -21,47 +23,48 @@
 </template>
 
 <script>
-import { Navbar, Sidebar, AppMain } from './components'
-import ResizeMixin from './mixin/ResizeHandler'
+import { Navbar, Sidebar, AppMain, TagsView } from "./components";
+import ResizeMixin from "./mixin/ResizeHandler";
 
 export default {
-  name: 'Layout',
+  name: "Layout",
   components: {
     Navbar,
     Sidebar,
-    AppMain
+    AppMain,
+    TagsView,
   },
   mixins: [ResizeMixin],
   computed: {
     sidebar() {
-      return this.$store.state.app.sidebar
+      return this.$store.state.app.sidebar;
     },
     device() {
-      return this.$store.state.app.device
+      return this.$store.state.app.device;
     },
     fixedHeader() {
-      return this.$store.state.settings.fixedHeader
+      return this.$store.state.settings.fixedHeader;
     },
     classObj() {
       return {
         hideSidebar: !this.sidebar.opened,
         openSidebar: this.sidebar.opened,
         withoutAnimation: this.sidebar.withoutAnimation,
-        mobile: this.device === 'mobile'
-      }
-    }
+        mobile: this.device === "mobile",
+      };
+    },
   },
   methods: {
     handleClickOutside() {
-      this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
-    }
-  }
-}
+      this.$store.dispatch("app/closeSideBar", { withoutAnimation: false });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-@import '~@/styles/mixin.scss';
-@import '~@/styles/variables.scss';
+@import "~@/styles/mixin.scss";
+@import "~@/styles/variables.scss";
 
 .app-wrapper {
   @include clearfix;

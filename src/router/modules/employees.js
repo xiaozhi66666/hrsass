@@ -2,14 +2,17 @@ import Layout from "@/layout";
 export default {
   path: "/employees",
   component: Layout,
+  name: "employees",
   meta: {
     id: "employees", //用于跟后台返回路由对应起来的id标识
+    title: "employees",
   },
   children: [
     {
       path: "",
+      name: "employees",
       component: () => import("@/views/employees"),
-      meta: { title: "员工", icon: "people" },
+      meta: { title: "employees", icon: "people" },
     },
     {
       path: "detail/:id",
