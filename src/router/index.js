@@ -85,7 +85,7 @@ export const asyncRoutes = [
 
 export const createRouter = () =>
   new Router({
-    // mode: 'history', // require service support
+    mode: "hash", // require service support
     scrollBehavior: () => ({ y: 0 }),
     // 将静态和动态路由解构放入数组规则中
     routes: [...constantRoutes],

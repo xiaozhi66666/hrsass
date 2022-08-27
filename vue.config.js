@@ -7,7 +7,6 @@ function resolve(dir) {
 }
 
 const name = defaultSettings.title || "vue Admin Template"; // page title
-
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
 // For example, Mac: sudo npm run
@@ -15,6 +14,17 @@ const name = defaultSettings.title || "vue Admin Template"; // page title
 // port = 9528 npm run dev OR npm run dev --port = 9528
 const port = process.env.port || process.env.npm_config_port || 8888; // dev port
 
+let externals = {}; // 声明一个变量表示要被生产环境所忽略的值
+if (process.env.NODE_ENV === "production") {
+  //如果是处于生产环境中那么就让他忽略这些指定的包
+  externals = {
+    echarts: "echarts",
+    "element-ui": "ELEMENT",
+    vue: "Vue",
+    xlsx: "XLSX",
+    "cos-js-sdk-v5": "COS",
+  };
+}
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -24,7 +34,7 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: "/",
+  publicPath: "./",
   outputDir: "dist",
   assetsDir: "static",
   // lintOnSave: process.env.NODE_ENV === "development",
@@ -55,6 +65,7 @@ module.exports = {
         "@": resolve("src"),
       },
     },
+    externals,
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -67,6 +78,10 @@ module.exports = {
         include: "initial",
       },
     ]);
+    config.plugin("html").tap((args) => {
+      args[0].myEnv = process.env.NODE_ENV;
+      return args;
+    });
 
     // when there are many pages, it will cause too many meaningless requests
     config.plugins.delete("prefetch");

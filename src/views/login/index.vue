@@ -73,6 +73,9 @@ export default {
       loading: false,
     };
   },
+  created() {
+    console.log("生产阶段");
+  },
   methods: {
     login() {
       this.loading = true;
